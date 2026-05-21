@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyclistic Bike-Share Case Study — Gabriel Almeida Alves</title>
+  <style>
+    :root {
+      --navy:   #1F3864;
+      --blue:   #2D5F8A;
+      --red:    #9E5A52;
+      --light:  #F5F8FC;
+      --border: #DDE4EE;
+      --text:   #1a1a2e;
+      --muted:  #5a6882;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: var(--text);
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 56px 40px 48px;
+      text-align: center;
+    }
+    header .label {
+      font-size: 12px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #a8c0e0;
+      margin-bottom: 14px;
+    }
+    header h1 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    header h1 span { color: #7BAFD4; }
+    header .subtitle {
+      font-size: 17px;
+      color: #c4d4e8;
+      margin-bottom: 28px;
+    }
+    header .author {
+      font-size: 15px;
+      color: #a8c0e0;
+    }
+    header .author strong { color: #fff; }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--blue);
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    nav a {
+      color: #c8ddf0;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .5px;
+      padding: 13px 22px;
+      transition: background .2s, color .2s;
+    }
+    nav a:hover { background: rgba(255,255,255,0.12); color: #fff; }
+
+    /* ── SECTIONS ── */
+    section { padding: 60px 40px; max-width: 960px; margin: 0 auto; }
+    section + section { border-top: 1px solid var(--border); }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--blue);
+      display: inline-block;
+    }
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--blue);
+      margin: 24px 0 8px;
+    }
+    p { margin-bottom: 14px; font-size: 15px; color: #333; }
+
+    /* ── QUESTION BLOCK ── */
+    .question {
+      background: var(--light);
+      border-left: 5px solid var(--blue);
+      padding: 20px 24px;
+      margin: 24px 0;
+      border-radius: 0 6px 6px 0;
+      font-size: 17px;
+      font-style: italic;
+      color: var(--navy);
+    }
+
+    /* ── STAT CARDS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin: 28px 0;
+    }
+    .stat-card {
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+    .stat-card .val {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .stat-card .lbl { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+    .stat-card.member .val { color: var(--blue); }
+    .stat-card.casual .val { color: var(--red); }
+    .stat-card.neutral .val { color: var(--navy); }
+
+    /* ── COMPARISON TABLE ── */
+    .comparison {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 14px;
+    }
+    .comparison th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .comparison th:first-child { background: var(--navy); color: #fff; }
+    .comparison th.member-h { background: var(--blue); color: #fff; }
+    .comparison th.casual-h { background: var(--red); color: #fff; }
+    .comparison td { padding: 11px 16px; border-bottom: 1px solid var(--border); }
+    .comparison tr:last-child td { border-bottom: none; }
+    .comparison tr:nth-child(even) td { background: var(--light); }
+    .comparison td:first-child { font-weight: 600; color: var(--navy); }
+
+    /* ── FINDING CARDS ── */
+    .findings { display: flex; flex-direction: column; gap: 20px; margin-top: 24px; }
+    .finding {
+      display: flex;
+      gap: 20px;
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      align-items: flex-start;
+    }
+    .finding-num {
+      background: var(--navy);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 800;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .finding-body h4 { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .finding-body p { font-size: 14px; margin: 0; }
+
+    /* ── RECOMMENDATIONS ── */
+    .recs { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+    .rec {
+      display: flex;
+      gap: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .rec-num {
+      background: var(--navy);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      width: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rec-body { padding: 18px 22px; }
+    .rec-body h4 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+    .rec-body p { font-size: 14px; margin: 0; color: #444; }
+
+    /* ── DASHBOARD ── */
+    #dashboard { background: var(--light); }
+    .tableau-wrap {
+      width: 100%;
+      margin-top: 28px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .tableau-wrap .tableauPlaceholder { width: 100% !important; }
+
+    /* ── TOOLS ── */
+    .tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .tool-badge {
+      background: var(--navy);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    /* ── DOWNLOADS ── */
+    .downloads { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-secondary { background: var(--navy); color: #fff; }
+    .btn-outline { background: #fff; color: var(--navy); border: 2px solid var(--navy); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy);
+      color: #a8c0e0;
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+    }
+    footer a { color: #7BAFD4; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      header, section { padding: 40px 20px; }
+      .finding { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <p class="label">Google Data Analytics Certificate — Capstone Project</p>
+  <h1>Cyclistic Bike-Share:<br><span>Converting Casual Riders</span></h1>
+  <p class="subtitle">A Data-Driven Campaign Strategy</p>
+  <p class="author"><strong>Gabriel Almeida Alves</strong> &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; R + Tableau</p>
+</header>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#question">Business Question</a>
+  <a href="#findings">Key Findings</a>
+  <a href="#dashboard">Dashboard</a>
+  <a href="#recommendations">Recommendations</a>
+  <a href="#files">Files</a>
+</nav>
+
+<!-- ── BUSINESS QUESTION ── -->
+<section id="question">
+  <h2>Business Question</h2>
+  <div class="question">
+    "How do annual members and casual riders use Cyclistic bikes differently — and how can those differences drive a campaign to convert casual riders into annual members?"
+  </div>
+  <p>Cyclistic's finance team determined that annual members are significantly more profitable than casual riders. This analysis was commissioned to identify behavioral patterns that would enable targeted, data-driven conversion campaigns.</p>
+
+  <div class="stats">
+    <div class="stat-card neutral">
+      <div class="val">5.7M</div>
+      <div class="lbl">Total rides analyzed</div>
+    </div>
+    <div class="stat-card member">
+      <div class="val">3,658,607</div>
+      <div class="lbl">Member rides</div>
+    </div>
+    <div class="stat-card casual">
+      <div class="val">2,032,986</div>
+      <div class="lbl">Casual rides</div>
+    </div>
+    <div class="stat-card neutral">
+      <div class="val">12 mo.</div>
+      <div class="lbl">May 2025 – Apr 2026</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── KEY FINDINGS ── -->
+<section id="findings">
+  <h2>Key Findings</h2>
+
+  <table class="comparison">
+    <thead>
+      <tr>
+        <th></th>
+        <th class="member-h">Annual Members</th>
+        <th class="casual-h">Casual Riders</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Avg. trip duration</td><td>12 minutes</td><td>19 minutes (+58%)</td></tr>
+      <tr><td>Median trip duration</td><td>8.6 min</td><td>11.3 min</td></tr>
+      <tr><td>Peak days</td><td>Mon – Fri</td><td>Sat – Sun</td></tr>
+      <tr><td>Peak hours</td><td>8am &amp; 5–6pm</td><td>12pm – 6pm</td></tr>
+      <tr><td>Station pattern</td><td>City-wide (residential + commercial)</td><td>Lakefront (tourist + recreational)</td></tr>
+      <tr><td>Winter demand</td><td>Consistent year-round</td><td>Nearly disappears (–92% vs. peak)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="findings">
+    <div class="finding">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <h4>Members commute. Casual riders explore.</h4>
+        <p>The activity heatmap shows members peaking at rush hours on weekdays — consistent with using bikes as a transportation tool. Casual riders peak on weekend afternoons, consistent with leisure, tourism, and recreation.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <h4>Casual riders take longer, more expensive trips.</h4>
+        <p>At 19 min average vs. 12 min for members, casual riders extract 58% more time per ride — while paying per trip instead of a flat annual fee. Frequent casual riders are structurally overpaying for the same usage a membership would cover.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <h4>Casual demand collapses in winter — and explodes in spring.</h4>
+        <p>Casual rides drop to ~25K in January vs. ~330K in August. Demand starts accelerating in April, creating a clear conversion window: reach casual riders before they lock into a summer of pay-per-trip habits.</p>
+      </div>
+    </div>
+    <div class="finding">
+      <div class="finding-num">4</div>
+      <div class="finding-body">
+        <h4>Casual riders cluster at Chicago's leisure corridor.</h4>
+        <p>The top casual stations concentrate near Millennium Park, Navy Pier, and Grant Park — Chicago's primary tourist and recreational corridor. Members distribute across residential and commercial neighborhoods city-wide.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DASHBOARD ── -->
+<section id="dashboard">
+  <h2>Interactive Dashboard</h2>
+  <p>Explore the full analysis — heatmap, seasonality, duration distribution, and station map — built in Tableau Public.</p>
+
+  <div class="tableau-wrap">
+    <div class='tableauPlaceholder' id='viz1' style='position: relative; width: 100%;'>
+      <noscript>
+        <a href='https://public.tableau.com/app/profile/gabriel.almeida.alves/viz/Cyclistic_Case_Study_17793310347890/Story1'>
+          <img alt='Cyclistic Case Study' src='https://public.tableau.com/static/images/Cy/Cyclistic_Case_Study_17793310347890/Story1/1_rss.png' style='border: none' />
+        </a>
+      </noscript>
+      <object class='tableauViz' style='display:none; width:100%; height:900px;'>
+        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+        <param name='embed_code_version' value='3' />
+        <param name='site_root' value='' />
+        <param name='name' value='Cyclistic_Case_Study_17793310347890/Story1' />
+        <param name='tabs' value='no' />
+        <param name='toolbar' value='yes' />
+        <param name='animate_transition' value='yes' />
+        <param name='display_static_image' value='yes' />
+        <param name='display_spinner' value='yes' />
+        <param name='display_overlay' value='yes' />
+        <param name='display_count' value='yes' />
+        <param name='language' value='en-US' />
+      </object>
+    </div>
+    <script type='text/javascript'>
+      var divElement = document.getElementById('viz1');
+      var vizElement = divElement.getElementsByTagName('object')[0];
+      vizElement.style.width = '100%';
+      vizElement.style.height = '900px';
+      var scriptElement = document.createElement('script');
+      scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+      vizElement.parentNode.insertBefore(scriptElement, vizElement);
+    </script>
+  </div>
+</section>
+
+<!-- ── RECOMMENDATIONS ── -->
+<section id="recommendations">
+  <h2>Recommendations</h2>
+  <p>Three targeted recommendations, each directly tied to the behavioral data above:</p>
+
+  <div class="recs">
+    <div class="rec">
+      <div class="rec-num">1</div>
+      <div class="rec-body">
+        <h4>Launch a Spring Conversion Campaign (April – June)</h4>
+        <p>Casual demand is accelerating but has not yet peaked. This is the highest-ROI window to reach casual riders before they establish a full summer of pay-per-trip habits. Offer a time-limited discounted annual membership valid for the full summer season.</p>
+      </div>
+    </div>
+    <div class="rec">
+      <div class="rec-num">2</div>
+      <div class="rec-body">
+        <h4>Target Weekend Afternoon Riders with In-App Messaging</h4>
+        <p>Behavioral data shows casual riders are most active on Saturday and Sunday afternoons (12–6pm). Deploy targeted push notifications personalized to each rider's actual usage history: "You've taken 12 rides this month. A membership would have covered all of them at a lower per-ride cost."</p>
+      </div>
+    </div>
+    <div class="rec">
+      <div class="rec-num">3</div>
+      <div class="rec-body">
+        <h4>Concentrate Physical Touchpoints at Lakefront Stations</h4>
+        <p>The top casual stations are near Millennium Park, Navy Pier, and the Museum Campus. Place QR codes and promotional signage at these dock stations. Staff seasonal brand activations during peak summer weekends — guaranteed exposure to the exact target audience.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FILES ── -->
+<section id="files">
+  <h2>Project Files</h2>
+  <p>Tools used in this analysis:</p>
+  <div class="tools">
+    <span class="tool-badge">R (tidyverse · lubridate)</span>
+    <span class="tool-badge">Tableau Public 2026.1.1</span>
+    <span class="tool-badge">Google Data Analytics Certificate</span>
+  </div>
+
+  <h3>Downloads</h3>
+  <div class="downloads">
+    <a class="btn btn-primary" href="https://github.com/alves-0213/cyclistic-case-study/raw/main/Cyclistic_Case_Study_Gabriel_Alves.pdf" target="_blank">
+      📄 Download Case Study (PDF)
+    </a>
+    <a class="btn btn-secondary" href="https://github.com/alves-0213/cyclistic-case-study/blob/main/cyclistic_analysis.R" target="_blank">
+      📂 View R Analysis Script
+    </a>
+    <a class="btn btn-outline" href="https://github.com/alves-0213/cyclistic-case-study" target="_blank">
+      GitHub Repository
+    </a>
+  </div>
+
+  <h3>Data Source</h3>
+  <p>Motivate International Inc. (2026). <em>Divvy trip data</em> [Dataset]. Made available under the <a href="https://divvybikes.com/data-license-agreement" target="_blank" style="color:var(--blue)">Divvy Data License Agreement</a>. "Cyclistic" is a fictional company name used in the Google Data Analytics Certificate capstone project; the underlying data reflects real Divvy Bikes trip records from Chicago.</p>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p><strong style="color:#fff">Gabriel Almeida Alves</strong> &nbsp;·&nbsp; Data Analytics Portfolio &nbsp;·&nbsp; May 2026</p>
+  <p style="margin-top:8px">
+    <a href="https://linkedin.com/in/-gabrielalves-" target="_blank">LinkedIn</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/alves-0213" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://public.tableau.com/app/profile/gabriel.almeida.alves" target="_blank">Tableau Public</a>
+  </p>
+</footer>
+
+</body>
+</html>
